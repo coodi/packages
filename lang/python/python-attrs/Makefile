@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-attrs
-PKG_VERSION:=17.4.0
-PKG_RELEASE:=2
+PKG_VERSION:=19.1.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=attrs-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://pypi.python.org/packages/8b/0b/a06cfcb69d0cb004fde8bc6f0fd192d96d565d1b8aa2829f0f20adb796e5
-PKG_HASH:=1c7960ccfd6a005cd9f7ba884e6316b5e430a3f1a6c37c5f87d8b43f83b54ec9
+PKG_SOURCE_URL:=https://files.pythonhosted.org/packages/source/a/attrs
+PKG_HASH:=f0b870f674851ecbfbbbd364d6b5cbdff9dcedbc7f3f5e18a6891057f21fe399
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(BUILD_VARIANT)-attrs-$(PKG_VERSION)
 
@@ -31,19 +31,18 @@ define Package/python-attrs/Default
   SECTION:=lang
   CATEGORY:=Languages
   SUBMENU:=Python
-  URL:=https://attrs.readthedocs.org/
+  TITLE:=Classes Without Boilerplate
+  URL:=https://www.attrs.org/
 endef
 
 define Package/python-attrs
 $(call Package/python-attrs/Default)
-  TITLE:=python-attrs
   DEPENDS:=+PACKAGE_python-attrs:python-light
   VARIANT:=python
 endef
 
 define Package/python3-attrs
 $(call Package/python-attrs/Default)
-  TITLE:=python3-attrs
   DEPENDS:=+PACKAGE_python3-attrs:python3-light
   VARIANT:=python3
 endef

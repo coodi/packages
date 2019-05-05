@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=classpath
 PKG_VERSION:=0.99
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 PKG_LICENSE:=GPL-2.0
 PKG_MAINTAINER:=Dana H. Myers <k6jq@comcast.net>
 
@@ -50,6 +50,7 @@ define Download/antlr
 endef
 $(eval $(call Download,antlr))
 
+EXTRA_CFLAGS += -Wno-error=implicit-fallthrough
 CONFIGURE_ARGS += \
 	--with-gmp="$(STAGING_DIR)/usr" \
 	--without-x \

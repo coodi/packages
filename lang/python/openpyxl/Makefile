@@ -8,13 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openpyxl
-PKG_VERSION:=2.5.0b1
-PKG_RELEASE:=1
+PKG_VERSION:=2.5.9
+PKG_RELEASE:=2
 PKG_LICENSE:=MIT
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://pypi.python.org/packages/88/3c/34fbe561fc92e6a75f297478b123c2590ca986d9f2d2dbf340d879aa24dd/
-PKG_HASH:=3b42ece7933b46b2128f8d4111c57c80fb5aa46f4d16e7f83281f169e7398ba7
+PKG_SOURCE_URL:=https://files.pythonhosted.org/packages/source/o/openpyxl
+PKG_HASH:=022c0f3fa1e873cc0ba20651c54dd5e6276fc4ff150b4060723add4fc448645e
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 include ../python-package.mk
@@ -23,7 +24,6 @@ define Package/openpyxl
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  MAINTAINER:=Gergely Kiss <mail.gery@gmail.com>
   TITLE:=A Python library to read/write Excel 2010 xlsx/xlsm files
   URL:=https://openpyxl.readthedocs.org/
   DEPENDS:=+python +django

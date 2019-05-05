@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=collectd
-PKG_VERSION:=5.8.0
+PKG_VERSION:=5.8.1
 PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://collectd.org/files/ \
 	https://github.com/collectd/collectd/releases/download/collectd-$(PKG_VERSION)
-PKG_HASH:=b06ff476bbf05533cb97ae6749262cc3c76c9969f032bd8496690084ddeb15c9
+PKG_HASH:=e796fda27ce06377f491ad91aa286962a68c2b54076aa77a29673d53204453da
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=aclocal.m4 libltdl/aclocal.m4
@@ -39,7 +39,6 @@ COLLECTD_PLUGINS_DISABLED:= \
 	dpdkevents \
 	dpdkstat \
 	drbd \
-	ethstat \
 	fhcount \
 	genericjmx \
 	gmond \
@@ -54,7 +53,6 @@ COLLECTD_PLUGINS_DISABLED:= \
 	ipvs \
 	java \
 	log_logstash \
-	lua \
 	lvm \
 	lpar \
 	madwifi \
@@ -129,6 +127,7 @@ COLLECTD_PLUGINS_SELECTED:= \
 	dns \
 	email \
 	entropy \
+	ethstat \
 	exec \
 	filecount \
 	fscache \
@@ -138,6 +137,7 @@ COLLECTD_PLUGINS_SELECTED:= \
 	iwinfo \
 	load \
 	logfile \
+	lua \
 	match_empty_counter \
 	match_hashed \
 	match_regex \
@@ -184,6 +184,8 @@ PKG_CONFIG_DEPENDS:= \
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/kernel.mk
+# collectd-mod-mysql needs iconv
+include $(INCLUDE_DIR)/nls.mk
 
 define Package/collectd/Default
   SECTION:=utils
@@ -194,7 +196,11 @@ endef
 
 define Package/collectd
 $(call Package/collectd/Default)
-  DEPENDS:= +libpthread +zlib +libltdl +libip4tc
+  DEPENDS:= +libpthread \
+	  +zlib \
+	  +libltdl \
+	  +libip4tc \
+	  +PACKAGE_collectd-mod-lua:liblua
   MENU:=1
 endef
 
@@ -211,10 +217,6 @@ define Package/collectd/config
 	select PACKAGE_collectd-mod-network
 endef
 
-ifneq ($(CONFIG_avr32),)
-  TARGET_CFLAGS += -fsigned-char
-endif
-
 # common configure args
 CONFIGURE_ARGS+= \
 	--disable-werror \
@@ -228,7 +230,12 @@ CONFIGURE_ARGS+= \
 CONFIGURE_VARS+= \
 	CFLAGS="$$$$CFLAGS $(FPIC)" \
 	LDFLAGS="$$$$LDFLAGS -lm -lz" \
-	KERNEL_DIR="$(LINUX_DIR)" \
+	KERNEL_DIR="$(LINUX_DIR)"
+
+ifneq ($(CONFIG_PACKAGE_collectd-mod-lua),)
+CONFIGURE_VARS+= \
+	LDFLAGS="$$$$LDFLAGS -llua"
+endif
 
 ifneq ($(CONFIG_PACKAGE_COLLECTD_ENCRYPTED_NETWORK),)
 CONFIGURE_ARGS+= \
@@ -352,6 +359,7 @@ $(eval $(call BuildPlugin,disk,disk usage/timing input,disk,))
 $(eval $(call BuildPlugin,dns,DNS traffic input,dns,+PACKAGE_collectd-mod-dns:libpcap))
 $(eval $(call BuildPlugin,email,email output,email,))
 $(eval $(call BuildPlugin,entropy,Entropy amount input,entropy,))
+$(eval $(call BuildPlugin,ethstat,Ethernet adapter statistics input,ethstat,))
 $(eval $(call BuildPlugin,exec,process exec input,exec,))
 $(eval $(call BuildPlugin,filecount,file count input,filecount,))
 $(eval $(call BuildPlugin,fscache,file-system based caching framework input,fscache,))
@@ -361,6 +369,7 @@ $(eval $(call BuildPlugin,irq,interrupt usage input,irq,))
 $(eval $(call BuildPlugin,iwinfo,libiwinfo wireless statistics,iwinfo,+PACKAGE_collectd-mod-iwinfo:libiwinfo))
 $(eval $(call BuildPlugin,load,system load input,load,))
 $(eval $(call BuildPlugin,logfile,log files output,logfile,))
+$(eval $(call BuildPlugin,lua,lua input/output,lua,+PACKAGE_collectd-mod-lua:liblua))
 $(eval $(call BuildPlugin,match-empty-counter,empty-counter match,match_empty_counter,))
 $(eval $(call BuildPlugin,match-hashed,hashed match,match_hashed,))
 $(eval $(call BuildPlugin,match-regex,regex match,match_regex,))
@@ -391,7 +400,7 @@ $(eval $(call BuildPlugin,tail,tail input,tail,))
 $(eval $(call BuildPlugin,tail-csv,tail CSV input,tail_csv,))
 $(eval $(call BuildPlugin,table,table-like structured file input,table,))
 $(eval $(call BuildPlugin,teamspeak2,TeamSpeak2 input,teamspeak2,))
-$(eval $(call BuildPlugin,ted,The Energy Detective input,ted,@((!TARGET_avr32)||BROKEN))) # fails on avr32 because of warnings treated as errors
+$(eval $(call BuildPlugin,ted,The Energy Detective input,ted,))
 $(eval $(call BuildPlugin,tcpconns,TCP connection tracking input,tcpconns,))
 $(eval $(call BuildPlugin,thermal,system temperatures input,thermal,))
 $(eval $(call BuildPlugin,unixsock,unix socket output,unixsock,))

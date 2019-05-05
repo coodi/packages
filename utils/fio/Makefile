@@ -8,15 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=fio
-PKG_VERSION:=3.6
-PKG_RELEASE:=1
-PKG_MAINTAINER:=Dragan Stancevic <ds@codeminutia.com>
-PKG_LICENSE:=GPL-2.0+
-PKG_LICENSE_FILES:=COPYING
+PKG_VERSION:=3.13
+PKG_RELEASE:=2
 
 PKG_SOURCE_URL:=http://brick.kernel.dk/snaps
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_HASH:=026a2cbb4a1bc9810f13f23d07eb146dbd4325bb467221dc49b88915ee8a52b4
+PKG_HASH:=a21d1e50c18eecbd5ee6f7c3c0a8c8605bbe31b91e07c387b2144b02ea3fb235
+
+PKG_MAINTAINER:=Rosen Penev <rosenp@gmail.com>
+PKG_LICENSE:=GPL-2.0+
+PKG_LICENSE_FILES:=COPYING
+
+PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -37,11 +40,13 @@ define Package/fio/description
 endef
 
 TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS))
+TARGET_LDFLAGS += -Wl,--gc-sections
 
 CONFIGURE_ARGS = \
 	--disable-numa \
 	--disable-rdma \
 	--disable-rados \
+	--disable-http \
 	--disable-rbd \
 	--disable-gfapi \
 	--disable-lex \

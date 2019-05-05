@@ -8,9 +8,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=opensc
-PKG_VERSION:=0.17.0
+PKG_VERSION:=0.19.0
 PKG_RELEASE:=1
-PKG_HASH:=be73c6816867ab4721e6a9ae7dba8e890c5f169f0a2cbb4bf354e0f30a948300
+PKG_HASH:=2c5a0e4df9027635290b9c0f3addbbf0d651db5ddb0ab789cb0e978f02fd5826
 
 PKG_LICENSE:=LGPL-2.1+
 PKG_LICENSE_FILES:=COPYING
@@ -97,6 +97,10 @@ define Package/libopensc-profile-$(subst _,-,$(firstword $(subst :, ,$(1))))
   DEPENDS:=libopensc
 endef
 endef
+
+CONFIGURE_ARGS += \
+	--disable-notify \
+	--disable-strict
 
 TOOLS:= \
 	cardos-tool \

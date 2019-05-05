@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=jamvm
 PKG_VERSION:=2.0.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 PKG_LICENSE:=GPL-2.0+
 PKG_MAINTAINER:=Dana H. Myers <k6jq@comcast.net>
 
@@ -30,13 +30,14 @@ define Package/jamvm
   CATEGORY:=Languages
   TITLE:=A compact Java Virtual Machine
   URL:=http://sourceforge.net/projects/jamvm
-  DEPENDS:=+zlib +libpthread +librt +classpath @!avr32
+  DEPENDS:=+zlib +libpthread +librt +classpath \
+	  @(i386||i686||x86_64||arm||armeb||mips||mipsel||powerpc||powerpc64) +CONFIG_powerpc64:libffi
 endef
 
 define Package/jamvm/description
- JamVM is a new Java Virtual Machine which conforms to the JVM
- specification version (blue book). In comparison to most other VM's (free
- and commercial) it is extremely small.However, unlike other small VMs
+ JamVM is a Java Virtual Machine which conforms to the JVM
+ specification version 2 (a.k.a, 1.2).  In comparison to most other VM's (free
+ and commercial) it is extremely small.  However, unlike other small VMs
  (e.g. KVM) it is designed to support the full specification, and includes
  support for object finalisation, Soft/Weak/Phantom References, the Java
  Native Interface (JNI) and the Reflection API.

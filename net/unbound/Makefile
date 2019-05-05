@@ -8,16 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=unbound
-PKG_VERSION:=1.7.1
-PKG_RELEASE:=4
-
-PKG_LICENSE:=BSD-3-Clause
-PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Eric Luehrsen <ericluehrsen@hotmail.com>
+PKG_VERSION:=1.9.1
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://www.unbound.net/downloads
-PKG_HASH:=56e085ef582c5372a20207de179d0edb4e541e59f87be7d4ee1d00d12008628d
+PKG_SOURCE_URL:=https://www.unbound.net/downloads
+PKG_HASH:=c3c0bf9b86ccba4ca64f93dd4fe7351308ab54293f297a67de5a8914c1dc59c5
+
+PKG_MAINTAINER:=Eric Luehrsen <ericluehrsen@gmail.com>
+PKG_LICENSE:=BSD-3-Clause
+PKG_LICENSE_FILES:=LICENSE
+PKG_CPE_ID:=cpe:/a:nlnetlabs:unbound
 
 PKG_BUILD_PARALLEL:=1
 PKG_FIXUP:=autoreconf
@@ -27,8 +28,8 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/unbound/Default
   TITLE:=Validating Recursive DNS Server
-  URL:=http://www.unbound.net/
-  DEPENDS:=+libopenssl
+  URL:=https://www.unbound.net/
+  DEPENDS:=+libopenssl +@OPENSSL_WITH_EC
 endef
 
 define Package/unbound
@@ -36,7 +37,7 @@ define Package/unbound
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=IP Addresses and Names
-  USERID:=unbound=553:unbound=553
+  USERID:=unbound:unbound
   TITLE+= (daemon)
   DEPENDS+= +libunbound
 endef
@@ -113,12 +114,15 @@ CONFIGURE_ARGS += \
 	--disable-dsa \
 	--disable-gost \
 	--enable-allsymbols \
+	--enable-ecdsa \
 	--enable-tfo-client \
 	--enable-tfo-server \
 	--with-libexpat="$(STAGING_DIR)/usr" \
 	--with-ssl="$(STAGING_DIR)/usr" \
-	--with-pidfile=/var/run/unbound.pid \
-	--with-user=unbound
+	--with-user=unbound \
+	--with-run-dir=/var/lib/unbound \
+	--with-conf-file=/var/lib/unbound/unbound.conf \
+	--with-pidfile=/var/run/unbound.pid
 
 define Package/unbound/conffiles
 /etc/config/unbound
@@ -142,7 +146,7 @@ define Package/unbound/install
 		$(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/unbound
 	$(INSTALL_DATA) \
-		$(PKG_INSTALL_DIR)/etc/unbound/unbound.conf \
+		$(PKG_INSTALL_DIR)/var/lib/unbound/unbound.conf \
 		$(1)/etc/unbound/unbound.conf
 	$(INSTALL_DATA) ./files/root.key $(1)/etc/unbound/root.key
 	$(INSTALL_DATA) ./files/unbound_ext.conf $(1)/etc/unbound/unbound_ext.conf
@@ -159,7 +163,7 @@ define Package/unbound/install
 	$(INSTALL_DATA) ./files/iptools.sh $(1)/usr/lib/unbound/iptools.sh
 	$(INSTALL_BIN)  ./files/odhcpd.sh $(1)/usr/lib/unbound/odhcpd.sh
 	$(INSTALL_DATA) ./files/odhcpd.awk $(1)/usr/lib/unbound/odhcpd.awk
-	$(INSTALL_DATA) ./files/rootzone.sh $(1)/usr/lib/unbound/rootzone.sh
+	$(INSTALL_DATA) ./files/stopping.sh $(1)/usr/lib/unbound/stopping.sh
 	$(INSTALL_DATA) ./files/unbound.sh $(1)/usr/lib/unbound/unbound.sh
 endef
 

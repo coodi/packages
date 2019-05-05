@@ -5,7 +5,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=postgresql
-PKG_VERSION:=9.6.8
+PKG_VERSION:=9.6.12
 PKG_RELEASE:=1
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 PKG_LICENSE:=PostgreSQL
@@ -16,12 +16,12 @@ PKG_SOURCE_URL:=\
 	http://ftp.postgresql.org/pub/source/v$(PKG_VERSION) \
 	ftp://ftp.postgresql.org/pub/source/v$(PKG_VERSION)
 
-PKG_HASH:=eafdb3b912e9ec34bdd28b651d00226a6253ba65036cb9a41cad2d9e82e3eb70
+PKG_HASH:=2e8c8446ba94767bda8a26cf5a2152bf0ae68a86aaebf894132a763084579d84
 
 PKG_USE_MIPS16:=0
 PKG_FIXUP:=autoreconf
 PKG_MACRO_PATHS:=config
-PKG_BUILD_DEPENDS += readline/host postgresql/host
+PKG_BUILD_DEPENDS:=readline/host postgresql/host
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/host-build.mk

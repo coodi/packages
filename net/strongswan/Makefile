@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012-2015 OpenWrt.org
+# Copyright (C) 2012-2018 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=strongswan
-PKG_VERSION:=5.6.3
+PKG_VERSION:=5.7.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_HASH:=c3c7dc8201f40625bba92ffd32eb602a8909210d8b3fac4d214c737ce079bf24
 PKG_SOURCE_URL:=http://download.strongswan.org/ http://download2.strongswan.org/
+PKG_HASH:=308e3ba76e2ce2da070e48fcebbe1fa923a27cc71e43bf63917e6f2a889ecc70
 PKG_LICENSE:=GPL-2.0+
 PKG_MAINTAINER:=Stijn Tintel <stijn@linux-ipv6.be>
 
@@ -103,6 +103,8 @@ PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
+# strongswan-mod-mysql needs iconv
+include $(INCLUDE_DIR)/nls.mk
 
 define Package/strongswan/Default
   SUBMENU:=VPN
@@ -118,6 +120,7 @@ endef
 
 define Package/strongswan
 $(call Package/strongswan/Default)
+  MENU:=1
   DEPENDS:= +libpthread +ip \
 	+kmod-crypto-authenc \
 	+kmod-ipsec +kmod-ipsec4 +IPV6:kmod-ipsec6 \
@@ -136,7 +139,7 @@ endef
 define Package/strongswan-full
 $(call Package/strongswan/Default)
   TITLE+= (full)
-  DEPENDS:= +strongswan \
+  DEPENDS:= strongswan \
 	+strongswan-charon \
 	+strongswan-charon-cmd \
 	+strongswan-ipsec \
@@ -229,7 +232,7 @@ endef
 define Package/strongswan-default
 $(call Package/strongswan/Default)
   TITLE+= (default)
-  DEPENDS:= +strongswan \
+  DEPENDS:= strongswan \
 	+strongswan-charon \
 	+strongswan-ipsec \
 	+strongswan-mod-aes \
@@ -272,7 +275,7 @@ endef
 define Package/strongswan-isakmp
 $(call Package/strongswan/Default)
   TITLE+= (isakmp)
-  DEPENDS:= +strongswan \
+  DEPENDS:= strongswan \
 	+strongswan-charon \
 	+strongswan-ipsec \
 	+strongswan-mod-aes \
@@ -302,7 +305,7 @@ endef
 define Package/strongswan-minimal
 $(call Package/strongswan/Default)
   TITLE+= (minimal)
-  DEPENDS:= +strongswan \
+  DEPENDS:= strongswan \
 	+strongswan-charon \
 	+strongswan-mod-aes \
 	+strongswan-mod-gmp \
@@ -327,7 +330,7 @@ endef
 define Package/strongswan-charon
 $(call Package/strongswan/Default)
   TITLE+= IKEv1/IKEv2 keying daemon
-  DEPENDS:= +strongswan
+  DEPENDS:= strongswan
 endef
 
 define Package/strongswan-charon/description
@@ -338,7 +341,7 @@ endef
 define Package/strongswan-charon-cmd
 $(call Package/strongswan/Default)
   TITLE+= charon-cmd utility
-  DEPENDS:= +strongswan +strongswan-charon
+  DEPENDS:= strongswan +strongswan-charon
 endef
 
 define Package/strongswan-charon-cmd/description
@@ -349,7 +352,7 @@ endef
 define Package/strongswan-ipsec
 $(call Package/strongswan/Default)
   TITLE+= utilities
-  DEPENDS:= +strongswan
+  DEPENDS:= strongswan
 endef
 
 define Package/strongswan-ipsec/description
@@ -360,7 +363,7 @@ endef
 define Package/strongswan-pki
 $(call Package/strongswan/Default)
   TITLE+= PKI tool
-  DEPENDS:= +strongswan
+  DEPENDS:= strongswan
 endef
 
 define Package/strongswan-pki/description
@@ -371,7 +374,7 @@ endef
 define Package/strongswan-scepclient
 $(call Package/strongswan/Default)
   TITLE+= SCEP client
-  DEPENDS:= +strongswan
+  DEPENDS:= strongswan
 endef
 
 define Package/strongswan-scepclient/description
@@ -382,7 +385,7 @@ endef
 define Package/strongswan-swanctl
 $(call Package/strongswan/Default)
   TITLE+= swanctl utility
-  DEPENDS:= +strongswan +strongswan-mod-vici
+  DEPENDS:= strongswan +strongswan-mod-vici
 endef
 
 define Package/strongswan-swanctl/description
@@ -393,7 +396,7 @@ endef
 define Package/strongswan-libtls
 $(call Package/strongswan/Default)
   TITLE+= libtls
-  DEPENDS:= +strongswan
+  DEPENDS:= strongswan
 endef
 
 define Package/strongswan-libtls/description
@@ -406,7 +409,7 @@ define BuildPlugin
   define Package/strongswan-mod-$(1)
     $$(call Package/strongswan/Default)
     TITLE:= StrongSwan $(2) plugin
-    DEPENDS:= +strongswan $(3)
+    DEPENDS:= strongswan $(3)
   endef
 
   define Package/strongswan-mod-$(1)/install
@@ -561,7 +564,9 @@ define Plugin/updown/install
 	$(INSTALL_DIR) $(1)/usr/lib/ipsec/plugins
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/ipsec/_updown $(1)/usr/lib/ipsec/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/ipsec/plugins/libstrongswan-updown.so $(1)/usr/lib/ipsec/plugins/
-	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/ipsec
+	$(CP) ./files/etc/hotplug.d/ipsec/01-user \
+		$(1)/etc/hotplug.d/ipsec/01-user
 endef
 
 define Plugin/vici/install

@@ -1,13 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ariang
+PKG_VERSION:=1.1.0
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/mayswind/AriaNg-DailyBuild
-PKG_SOURCE_DATE:=2018-05-21
-PKG_SOURCE_VERSION:=304500c3f042ac5387e4dd5d6ea159999d249314
-PKG_MIRROR_HASH:=f5bb5aad024f0916becc8d36832e5d864cd078553c5a719c715a00ecc72af90e
+PKG_MIRROR_HASH:=31a41eed1d812956bf0c482b961cc86ab1b9ad2863e9b17f383330d3067c444f
+PKG_SOURCE_VERSION:=ca6f9168bdfbfc1fd3cbb1bac4600010d3725c0c
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
@@ -15,18 +15,32 @@ PKG_MAINTAINER:=Ansuel Smith <ansuelsmth@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/ariang
+define Package/ariang/default
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=Download Manager
-  DEPENDS:=+uhttpd +aria2
-  TITLE:=AriaNg is a web frontend making aria2 easier to use.
+  DEPENDS:=+aria2
+  TITLE:=AriaNg webui
   URL:=https://github.com/mayswind/AriaNg
   PKGARCH:=all
 endef
 
 define Package/ariang/description
 	AriaNg is a web frontend making aria2 easier to use. AriaNg is written in pure html & javascript, thus it does not need any compilers or runtime environment.
+endef
+
+Package/ariang-nginx/description = $(Package/ariang/description)
+
+define Package/ariang
+  $(Package/ariang/default)
+  DEPENDS += +uhttpd
+  TITLE += for uhttpd webserver
+endef
+
+define Package/ariang-nginx
+  $(Package/ariang/default)
+  DEPENDS += +nginx
+  TITLE += for nginx webserver
 endef
 
 define Build/Compile
@@ -45,4 +59,13 @@ define Package/ariang/install
 		$(1)/www/ariang
 endef
 
+define Package/ariang-nginx/install
+	$(Package/ariang/install)
+	$(INSTALL_DIR) $(1)/etc/nginx
+	$(INSTALL_BIN) ./files/ariang.conf $(1)/etc/nginx/ariang.conf
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/80_ariang-nginx-support $(1)/etc/uci-defaults/80_ariang-nginx-support
+endef
+
 $(eval $(call BuildPackage,ariang))
+$(eval $(call BuildPackage,ariang-nginx))

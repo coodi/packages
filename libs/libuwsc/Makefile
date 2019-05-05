@@ -8,75 +8,56 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuwsc
-PKG_VERSION:=2.0.2
+PKG_VERSION:=3.2.2
 PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_VERSION:=v$(PKG_VERSION)
-PKG_SOURCE_URL=https://github.com/zhaojh329/libuwsc.git
-PKG_MIRROR_HASH:=8f384a41aa9adf50fefa933a01b695d1bb6505af03d6c0cb3506283fc0229b34
-CMAKE_INSTALL:=1
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL=https://codeload.github.com/zhaojh329/libuwsc/tar.gz/v$(PKG_VERSION)?
+PKG_HASH:=824a29446ba12171f8f08778667c6b3a0528e18c249f0cf1f89b5f129cd2aadd
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
 
-PKG_BUILD_DIR=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_SOURCE_SUBDIR)
-
+PKG_MAINTAINER:=Jianhui Zhao <jianhuizhao329@gmail.com>
 PKG_LICENSE:=LGPL-2.1
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_MAINTAINER:=Jianhui Zhao <jianhuizhao329@gmail.com>
+PKG_BUILD_PARALLEL:=1
+CMAKE_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
-define Package/libuwsc/default
+define Package/libuwsc/Default
+  TITLE:=A lightweight WebSocket client library based on libev
   SECTION:=libs
   CATEGORY:=Libraries
   SUBMENU:=Networking
-  TITLE:=Lightweight WebSocket client library
-  DEPENDS:=+libubox
+  URL:=https://github.com/zhaojh329/libuwsc
+  DEPENDS:=+libev $(2)
+  VARIANT:=$(1)
+  PROVIDES:=libuwsc
 endef
 
-define Package/libuwsc-nossl
-  $(Package/libuwsc/default)
-  TITLE += (NO SSL)
-  VARIANT:=nossl
-endef
+Package/libuwsc-openssl=$(call Package/libuwsc/Default,openssl,+PACKAGE_libuwsc-openssl:libopenssl)
+Package/libuwsc-wolfssl=$(call Package/libuwsc/Default,wolfssl,+PACKAGE_libuwsc-wolfssl:libwolfssl)
+Package/libuwsc-mbedtls=$(call Package/libuwsc/Default,mbedtls,+PACKAGE_libuwsc-mbedtls:libmbedtls)
+Package/libuwsc-nossl=$(call Package/libuwsc/Default,nossl)
 
-define Package/libuwsc-openssl
-  $(Package/libuwsc/default)
-  TITLE += (openssl)
-  DEPENDS += +libustream-openssl
-  VARIANT:=openssl
-endef
-
-define Package/libuwsc-wolfssl
-  $(Package/libuwsc/default)
-  TITLE += (wolfssl)
-  DEPENDS += +libustream-wolfssl
-  VARIANT:=wolfssl
-endef
-
-define Package/libuwsc-mbedtls
-  $(Package/libuwsc/default)
-  TITLE += (mbedtls)
-  DEPENDS += +libustream-mbedtls
-  VARIANT:=mbedtls
-endef
-
-ifeq ($(BUILD_VARIANT),nossl)
-  CMAKE_OPTIONS += -DUWSC_SSL_SUPPORT=off
+ifeq ($(BUILD_VARIANT),openssl)
+  CMAKE_OPTIONS += -DUWSC_USE_OPENSSL=ON
+else ifeq ($(BUILD_VARIANT),wolfssl)
+  CMAKE_OPTIONS += -DUWSC_USE_WOLFSSL=ON
+else ifeq ($(BUILD_VARIANT),mbedtls)
+  CMAKE_OPTIONS += -DUWSC_USE_MBEDTLS=ON
+else
+  CMAKE_OPTIONS += -DUWSC_SSL_SUPPORT=OFF
 endif
 
-define Package/libuwsc/default/install
+define Package/libuwsc-$(BUILD_VARIANT)/install
 	$(INSTALL_DIR) $(1)/usr/lib/
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/libuwsc.so* $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libuwsc.so* $(1)/usr/lib/
 endef
 
-Package/libuwsc-nossl/install = $(Package/libuwsc/default/install)
-Package/libuwsc-openssl/install = $(Package/libuwsc/default/install)
-Package/libuwsc-wolfssl/install = $(Package/libuwsc/default/install)
-Package/libuwsc-mbedtls/install = $(Package/libuwsc/default/install)
-
-$(eval $(call BuildPackage,libuwsc-nossl))
-$(eval $(call BuildPackage,libuwsc-mbedtls))
-$(eval $(call BuildPackage,libuwsc-wolfssl))
 $(eval $(call BuildPackage,libuwsc-openssl))
+$(eval $(call BuildPackage,libuwsc-wolfssl))
+$(eval $(call BuildPackage,libuwsc-mbedtls))
+$(eval $(call BuildPackage,libuwsc-nossl))

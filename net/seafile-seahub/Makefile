@@ -8,16 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=seafile-seahub
-PKG_VERSION:=6.2.2
-PKG_RELEASE=$(PKG_SOURCE_VERSION)-1
+PKG_VERSION:=6.3.4
+PKG_RELEASE:=3
 PKG_LICENSE:=Apache-2.0
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/haiwen/seahub.git
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=120e7a299e77968f1af48ea2dcf4bd9b909c426f
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
-PKG_MIRROR_HASH:=511500c40dd7b1009f77109c6df810df1cf2c17a84a8f6841d592a9e05d22064
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/haiwen/seahub/tar.gz/v$(PKG_VERSION)-server?
+PKG_HASH:=53a9efdb6791fd3a2a191e89cb0f133632056046ec08adbb2ad72088e6161430
+PKG_BUILD_DIR:=$(BUILD_DIR)/seahub-$(PKG_VERSION)-server
+
+PKG_BUILD_DEPENDS:=python-pytz/host
 
 include $(INCLUDE_DIR)/package.mk
 include ../../lang/python/python-package.mk
@@ -26,12 +26,13 @@ define Package/seafile-seahub
     SECTION:=net
     CATEGORY:=Network
     TITLE:=Seafile server - seahub component
-    MAINTAINER:=Gergely Kiss <mail.gery@gmail.com>
-    URL:=http://seafile.com/
-    DEPENDS:=+simplejson +python +pillow +chardet +django +django-appconf \
-		+django-compressor +django-constance +django-jsonfield +django-picklefield \
-		+django-postoffice +django-restframework +django-statici18n +et_xmlfile \
-		+flup +gunicorn +jdcal +openpyxl +python-dateutil +python-mysql +pytz +rcssmin
+    URL:=https://seafile.com/
+    DEPENDS:=+python-simplejson +python +pillow +python-chardet +django +django-appconf \
+		+django-compressor +django-constance +django-formtools +django-jsonfield \
+		+django-picklefield +django-postoffice +django-restframework \
+		+django-simple-captcha +django-statici18n +django-webpack-loader \
+		+flup +gunicorn +openpyxl +python-dateutil +python-mysql \
+		+python-qrcode +python-requests +python-requests-oauthlib +python-pytz
 endef
 
 define Build/Configure

@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-hyperlink
-PKG_VERSION:=17.3.1
+PKG_VERSION:=19.0.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=hyperlink-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://files.pythonhosted.org/packages/source/h/hyperlink
-PKG_HASH:=bc4ffdbde9bdad204d507bd8f554f16bba82dd356f6130cb16f41422909c33bc
+PKG_HASH:=4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(BUILD_VARIANT)-hyperlink-$(PKG_VERSION)
 
@@ -31,20 +31,23 @@ define Package/python-hyperlink/Default
   SECTION:=lang
   CATEGORY:=Languages
   SUBMENU:=Python
+  TITLE:=Pure-Python immutable URLs
   URL:=https://github.com/python-hyper/hyperlink
 endef
 
 define Package/python-hyperlink
 $(call Package/python-hyperlink/Default)
-  TITLE:=Pure-Python immutable URLs
-  DEPENDS:=+PACKAGE_python-hyperlink:python-light
+  DEPENDS:= \
+      +PACKAGE_python-hyperlink:python-light \
+      +PACKAGE_python-hyperlink:python-idna
   VARIANT:=python
 endef
 
 define Package/python3-hyperlink
 $(call Package/python-hyperlink/Default)
-  TITLE:=Pure-Python immutable URLs
-  DEPENDS:=+PACKAGE_python3-hyperlink:python3-light
+  DEPENDS:= \
+      +PACKAGE_python3-hyperlink:python3-light \
+      +PACKAGE_python3-hyperlink:python3-idna
   VARIANT:=python3
 endef
 
